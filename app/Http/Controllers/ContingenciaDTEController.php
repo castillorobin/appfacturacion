@@ -1,0 +1,192 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\ContingenciaDTE;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Factura;
+use App\Models\FacturaDetalle;
+use App\Models\Models\Cliente;
+use App\Models\Producto;
+use App\Models\MovimientoCaja;
+use App\Models\Proveedor;
+
+use Illuminate\Support\Facades\DB;
+use App\Services\DTEService;
+use App\Models\Actividad;
+
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
+
+
+class ContingenciaDTEController extends Controller
+{
+    public function index()
+    {
+        $dtes = ContingenciaDTE::orderByDesc('created_at')->get();
+        return view('contingencia.index', compact('dtes'));
+    }
+
+    public function reportar(Request $request, $id)
+    {
+        $dte = ContingenciaDTE::findOrFail($id);
+        $original = json_decode(Storage::get($dte->json_original_path), true);
+        //dd($original);
+
+        /*
+        $dte = ContingenciaDTE::findOrFail($id);
+        $dte->estado = 'reportado';
+        $dte->save();
+        */
+        if ($original['identificacion']['tipoDte'] == '03') {
+           
+            return view('contingencia.reportardteccf', compact('original'));
+        }
+        if ($original['identificacion']['tipoDte'] == '01') {
+            return view('contingencia.reportardteconsumidor', compact('original'));
+        }
+        
+
+       // return redirect()->back()->with('success', 'DTE marcado como reportado.');
+    }
+
+    public function enviar($id)
+    {
+         $dte = ContingenciaDTE::findOrFail($id);
+        $original = json_decode(Storage::get($dte->json_original_path), true);
+        //dd($original);
+
+        /*
+        $dte = ContingenciaDTE::findOrFail($id);
+        $dte->estado = 'reportado';
+        $dte->save();
+        */
+        if ($original['identificacion']['tipoDte'] == '03') {
+            return view('contingencia.enviardteccf', compact('original'));
+        }
+        if ($original['identificacion']['tipoDte'] == '01') {
+            return view('contingencia.enviardteconsumidor', compact('original'));
+        }
+        
+    }
+
+    public function crearcontingencia()
+    {
+        $clientes = Cliente::all();
+        $productos = Producto::all();
+        return view('contingencia.crear', compact('clientes', 'productos'));
+    }
+
+    public function store(Request $request)
+    {
+        if (!obtenerCajaAbiertaUsuario()) {
+        return back()->with('error', 'Debe abrir caja antes de realizar esta operación.');
+    }
+
+    $caja = obtenerCajaAbiertaUsuario();
+    $factura = null; // <-- declarar aquí
+
+    $request->validate([
+        'cliente_id' => 'required',
+        'tipo' => 'required',
+        'productos_json' => 'required|string',
+    ]);
+
+    DB::transaction(function () use ($request, &$factura) {
+        $cliente = Cliente::findOrFail($request->cliente_id);
+
+        $factura = Factura::create([
+            'cliente_id' => $cliente->id,
+            'tipo' => $request->tipo,
+            'fecha' => now(),
+            'numero' => 'F' . str_pad(Factura::max('id') + 1, 6, '0', STR_PAD_LEFT),
+            'total_sin_iva' => 0,
+            'iva' => 0,
+            'total' => 0,
+        ]);
+
+        $items = json_decode($request->input('productos_json'), true);
+        if (!is_array($items) || empty($items)) {
+            throw new \Exception('No se proporcionaron productos válidos.');
+        }
+
+        $subtotal = 0;
+
+        foreach ($items as $item) {
+            $producto = Producto::findOrFail($item['producto_id']);
+            $cantidad = $item['cantidad'];
+            $precio_unitario = $producto->precio_venta;
+            $subtotal_detalle = $precio_unitario * $cantidad;
+
+            FacturaDetalle::create([
+                'factura_id' => $factura->id,
+                'producto_id' => $producto->id,
+                'cantidad' => $cantidad,
+                'precio_unitario' => $precio_unitario,
+                'subtotal' => $subtotal_detalle,
+            ]);
+
+            $producto->stock -= $cantidad;
+            $producto->save();
+
+            $subtotal += $subtotal_detalle;
+        }
+
+        $iva = $subtotal * 0.13;
+        $total = $subtotal + $iva;
+
+        $factura->update([
+            'total_sin_iva' => $subtotal,
+            'iva' => $iva,
+            'total' => $total,
+        ]);
+    });
+
+    // Aquí ya puedes usar $factura
+    if ($caja && $factura) {
+        MovimientoCaja::create([
+            'caja_id' => $caja->id,
+            'tipo' => 'ingreso',
+            'monto' => $factura->total,
+            'descripcion' => 'Factura emitida - Nº: ' . $factura->numero,
+            'fecha' => now(),
+                'referencia_id' => $factura->id,
+    'referencia_type' => \App\Models\Factura::class,
+    'user_id' => auth()->id(), // ← este campo es obligatorio
+        ]);
+    }
+   // $detalles = FacturaDetalle::where('factura_id', $factura->id)->get();
+   $detalles = FacturaDetalle::with('producto')
+    ->where('factura_id', $factura->id)
+    ->get()
+    ->map(function ($detalle) {
+        $total = $detalle->cantidad * $detalle->precio_unitario;
+        return (object)[
+            'cantidad' => $detalle->cantidad,
+            'descripcion' => $detalle->producto->nombre,
+            'precio_unitario' => $detalle->precio_unitario,
+            'preciouni' => $detalle->precio_unitario,
+            'total' => $total,
+            'id' => $detalle->id,
+            'coticode' => $detalle->factura_id,
+        ];
+    });
+    $cliente = Cliente::where('id', $factura->cliente_id)->get();
+    $actual = $factura->created_at;
+    if ($request->tipo == "consumidor") {
+        return view('contingencia.generardteconsumidor', compact('actual', 'detalles', 'cliente'));
+    }elseif ($request->tipo == "ccf") {
+
+        $codactividad = $cliente[0]->actividad_economica_id;
+
+        $actividad = Actividad::where('codigo', $codactividad)->get();
+        $actividad_descripcion = $actividad[0]->descripcion ?? 'No especificada';
+
+         return view('contingencia.generardteccf', compact('actual', 'detalles', 'cliente', 'actividad_descripcion'));
+    }
+    }
+
+
+
+}
