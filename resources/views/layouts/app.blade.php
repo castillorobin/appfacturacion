@@ -48,13 +48,6 @@
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview">
                     {{-- 1. Administrar Caja --}}
 
-<li class="nav-item">
-    <a href="{{ route('cajas.index') }}" class="nav-link {{ request()->routeIs('cajas.*') ? 'active' : '' }}">
-        <i class="nav-icon fas fa-cash-register"></i>
-        <p>Control de Caja</p>
-    </a>
-</li>
-
 {{-- 2. Administrar DTE --}}
 <li class="nav-item has-treeview">
     <a href="#" class="nav-link">
