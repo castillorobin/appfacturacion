@@ -102,7 +102,7 @@
 {{-- 6. Facturación --}}
 <li class="nav-item has-treeview {{ request()->routeIs('facturas.*') ? 'menu-open' : '' }}">
 
-    <a href=" {{ route('facturas.index') }}" class="nav-link">
+    <a href=" {{ route('facturas.create') }}" class="nav-link">
         <i class="nav-icon fas fa-file-invoice-dollar"></i>
         <p>
             Facturación

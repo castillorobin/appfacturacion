@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/productos/{producto}/edit', [ProductoWebController::class, 'edit'])->name('productos.edit');
     Route::put('/productos/{producto}', [ProductoWebController::class, 'update'])->name('productos.update');
     Route::delete('/productos/{producto}', [ProductoWebController::class, 'destroy'])->name('productos.destroy');
-
+ 
 
     Route::resource('categorias', CategoriaController::class)->except('show');
     Route::get('ajustes/create', [AjusteInventarioController::class, 'create'])->name('ajustes.create');

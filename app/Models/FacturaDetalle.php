@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class FacturaDetalle extends Model
 {
     protected $fillable = [
-'factura_id', 'producto_id', 'cantidad', 'precio_unitario', 'subtotal'
+'factura_id', 'producto_id', 'cantidad', 'precio_unitario', 'subtotal', 'descripcion'
 ];
 
 

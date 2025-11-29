@@ -73,12 +73,7 @@ public function generarSujetoExcluido()
 
 public function store(Request $request)
 {
-    if (!obtenerCajaAbiertaUsuario()) {
-        return back()->with('error', 'Debe abrir caja antes de realizar esta operación.');
-    }
-
-    $caja = obtenerCajaAbiertaUsuario();
-    $factura = null; // <-- declarar aquí
+    $factura = null;
 
     $request->validate([
         'cliente_id' => 'required',
@@ -87,6 +82,7 @@ public function store(Request $request)
     ]);
 
     DB::transaction(function () use ($request, &$factura) {
+
         $cliente = Cliente::findOrFail($request->cliente_id);
 
         $factura = Factura::create([
@@ -99,7 +95,9 @@ public function store(Request $request)
             'total' => 0,
         ]);
 
-        $items = json_decode($request->input('productos_json'), true);
+        // Ahora los productos vienen manuales
+        $items = json_decode($request->productos_json, true);
+
         if (!is_array($items) || empty($items)) {
             throw new \Exception('No se proporcionaron productos válidos.');
         }
@@ -107,40 +105,25 @@ public function store(Request $request)
         $subtotal = 0;
 
         foreach ($items as $item) {
-            $producto = Producto::findOrFail($item['producto_id']);
+
+            $descripcion = $item['descripcion'];
             $cantidad = $item['cantidad'];
-            $precio_unitario = $producto->precio_venta;
-            $subtotal_detalle = $precio_unitario * $cantidad;
+            $precio_unitario = $item['precio'];
+            $subtotal_detalle = $item['subtotal'];
 
             FacturaDetalle::create([
                 'factura_id' => $factura->id,
-                'producto_id' => $producto->id,
+                'descripcion' => $descripcion,
                 'cantidad' => $cantidad,
                 'precio_unitario' => $precio_unitario,
                 'subtotal' => $subtotal_detalle,
             ]);
 
-            $producto->stock -= $cantidad;
-            $producto->save();
-
+            // Sumar al total general
             $subtotal += $subtotal_detalle;
-
-           // Registrar en Kardex (salida por venta)
-                Kardex::create([
-                    'producto_id' => $producto->id,
-                    'fecha' => now(),
-                    'tipo' => strtoupper($request->tipo), // CCF, CONSUMIDOR, etc.
-                    'documento' => $factura->id,
-                    'descripcion' => 'Venta registrada en factura ' . $factura->numero,
-                    'Sunidad' => $cantidad, // unidades que salieron
-                    'Scosto' => $producto->precio_costo, // costo unitario promedio actual
-                    'Tunidad' => $producto->stock, // stock actual luego de la venta
-                    'Tcostop' => $producto->precio_costo, // costo promedio actual
-                    'saldo' => $producto->stock * $producto->precio_costo, // valor total del stock actual
-                ]);
-
         }
 
+        // Cálculo de impuestos
         $iva = $subtotal * 0.13;
         $total = $subtotal + $iva;
 
@@ -149,58 +132,38 @@ public function store(Request $request)
             'iva' => $iva,
             'total' => $total,
         ]);
-
-        
-
-   
     });
 
-    // Aquí ya puedes usar $factura
-    if ($caja && $factura) {
-        MovimientoCaja::create([
-            'caja_id' => $caja->id,
-            'tipo' => 'ingreso',
-            'monto' => $factura->total,
-            'descripcion' => 'Factura emitida - Nº: ' . $factura->numero,
-            'fecha' => now(),
-                'referencia_id' => $factura->id,
-    'referencia_type' => \App\Models\Factura::class,
-    'user_id' => auth()->id(), // ← este campo es obligatorio
-        ]);
-    }
-   // $detalles = FacturaDetalle::where('factura_id', $factura->id)->get();
-   $detalles = FacturaDetalle::with('producto')
-    ->where('factura_id', $factura->id)
-    ->get()
-    ->map(function ($detalle) {
-        $total = $detalle->cantidad * $detalle->precio_unitario;
-        return (object)[
-            'cantidad' => $detalle->cantidad,
-            'descripcion' => $detalle->producto->nombre,
-            'precio_unitario' => $detalle->precio_unitario,
-            'preciouni' => $detalle->precio_unitario,
-            'total' => $total,
-            'id' => $detalle->id,
-            'coticode' => $detalle->factura_id,
-        ];
-    });
+    // --- Construcción de datos para la impresión ---
+    $detalles = FacturaDetalle::where('factura_id', $factura->id)
+        ->get()
+        ->map(function ($detalle) {
+            return (object)[
+                'cantidad' => $detalle->cantidad,
+                'descripcion' => $detalle->descripcion,
+                'precio_unitario' => $detalle->precio_unitario,
+                'preciouni' => $detalle->precio_unitario,
+                'total' => $detalle->subtotal,
+                'id' => $detalle->id,
+                'coticode' => $detalle->factura_id,
+            ];
+        });
+
     $cliente = Cliente::where('id', $factura->cliente_id)->get();
     $actual = $factura->created_at;
+
     if ($request->tipo == "consumidor") {
         $conteo = ConteoDTE::where('tipo', 'consumidor')->first();
-       // dd($conteo->conteo);
         return view('facturas.generardteconsumidor', compact('actual', 'detalles', 'cliente', 'conteo'));
-    }elseif ($request->tipo == "ccf") {
+    } else if ($request->tipo == "ccf") {
 
         $codactividad = $cliente[0]->actividad_economica_id;
-
         $actividad = Actividad::where('codigo', $codactividad)->get();
         $actividad_descripcion = $actividad[0]->descripcion ?? 'No especificada';
         $conteo = ConteoDTE::where('tipo', 'ccf')->first();
+
         return view('facturas.generardteccf', compact('actual', 'detalles', 'cliente', 'actividad_descripcion', 'conteo'));
     }
-    
-
 }
 
 public function show(Factura $factura)
