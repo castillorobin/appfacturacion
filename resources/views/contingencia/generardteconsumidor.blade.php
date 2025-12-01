@@ -257,7 +257,7 @@ $hora_actual = date("h:i:s");
 // Función para crear el DTE
 function crearDTE($fecha_actual, $cliente, $hora_actual, $detalles) {
 
- $paradte = 20000000000 + $detalles[0]->id;
+ $paradte = 70000000000 + $detalles[0]->id;
     
     $dte = new DocumentoTributarioElectronico();
     
@@ -270,23 +270,23 @@ function crearDTE($fecha_actual, $cliente, $hora_actual, $detalles) {
     
     // Configurar emisor
     $dte->emisor = new Emisor();
-    $dte->emisor->nit = "008688551";
-    $dte->emisor->nrc = "3728110";
-    $dte->emisor->nombre = "VILMA JANNET GODOY MENDOZA";
-    $dte->emisor->codActividad = "47214";
-    $dte->emisor->descActividad = "VENTA AL POR MENOR DE PRODUCTOS LACTEOS";
-    $dte->emisor->nombreComercial = "VILMA JANNET GODOY MENDOZA";
+    $dte->emisor->nit = "050080424";
+    $dte->emisor->nrc = "3100846";
+    $dte->emisor->nombre = "ERICK ROBERTO CLIMACO ARRIAGA";
+    $dte->emisor->codActividad = "53100";
+    $dte->emisor->descActividad = "Servicios de Correo Nacional";
+    $dte->emisor->nombreComercial = "ERICK CLIMACO";
     $dte->emisor->tipoEstablecimiento = "02";
     $dte->emisor->direccion = new Direccion();
-    $dte->emisor->direccion->departamento = "02";
-    $dte->emisor->direccion->municipio = "01";
-    $dte->emisor->direccion->complemento = "PTO 23 VTA 10 AV SUR ENTRE 15 Y 17 CL PTE TERM DE BUSES FCO CL LA TERMINAL 116";
-    $dte->emisor->telefono = "2429-0920";
+    $dte->emisor->direccion->departamento = "06";
+    $dte->emisor->direccion->municipio = "23";
+    $dte->emisor->direccion->complemento = "Calle Sisimiles, costado norte de Metrocentro, Local 3-1";
+    $dte->emisor->telefono = "7457-6280";
     $dte->emisor->codEstableMH = null;
     $dte->emisor->codEstable = null;
     $dte->emisor->codPuntoVentaMH = null;
     $dte->emisor->codPuntoVenta = null;
-    $dte->emisor->correo = "vilmademendoza71@gmail.com";
+    $dte->emisor->correo = "facturacionmeloexpress@gmail.com";
 
     // Configurar receptor
     $dte->receptor = new Receptor();

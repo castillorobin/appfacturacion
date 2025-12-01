@@ -17,7 +17,7 @@ use App\Services\DTEService;
 use App\Models\Actividad;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
+use Illuminate\Support\Str; 
 
 
 class ContingenciaDTEController extends Controller
@@ -79,13 +79,7 @@ class ContingenciaDTEController extends Controller
     }
 
     public function store(Request $request)
-    {
-        if (!obtenerCajaAbiertaUsuario()) {
-        return back()->with('error', 'Debe abrir caja antes de realizar esta operación.');
-    }
-
-    $caja = obtenerCajaAbiertaUsuario();
-    $factura = null; // <-- declarar aquí
+    { $factura = null;
 
     $request->validate([
         'cliente_id' => 'required',
@@ -94,6 +88,7 @@ class ContingenciaDTEController extends Controller
     ]);
 
     DB::transaction(function () use ($request, &$factura) {
+
         $cliente = Cliente::findOrFail($request->cliente_id);
 
         $factura = Factura::create([
@@ -106,7 +101,9 @@ class ContingenciaDTEController extends Controller
             'total' => 0,
         ]);
 
-        $items = json_decode($request->input('productos_json'), true);
+        // Ahora los productos vienen manuales
+        $items = json_decode($request->productos_json, true);
+
         if (!is_array($items) || empty($items)) {
             throw new \Exception('No se proporcionaron productos válidos.');
         }
@@ -114,25 +111,25 @@ class ContingenciaDTEController extends Controller
         $subtotal = 0;
 
         foreach ($items as $item) {
-            $producto = Producto::findOrFail($item['producto_id']);
+
+            $descripcion = $item['descripcion'];
             $cantidad = $item['cantidad'];
-            $precio_unitario = $producto->precio_venta;
-            $subtotal_detalle = $precio_unitario * $cantidad;
+            $precio_unitario = $item['precio'];
+            $subtotal_detalle = $item['subtotal'];
 
             FacturaDetalle::create([
                 'factura_id' => $factura->id,
-                'producto_id' => $producto->id,
+                'descripcion' => $descripcion,
                 'cantidad' => $cantidad,
                 'precio_unitario' => $precio_unitario,
                 'subtotal' => $subtotal_detalle,
             ]);
 
-            $producto->stock -= $cantidad;
-            $producto->save();
-
+            // Sumar al total general
             $subtotal += $subtotal_detalle;
         }
 
+        // Cálculo de impuestos
         $iva = $subtotal * 0.13;
         $total = $subtotal + $iva;
 
@@ -143,37 +140,25 @@ class ContingenciaDTEController extends Controller
         ]);
     });
 
-    // Aquí ya puedes usar $factura
-    if ($caja && $factura) {
-        MovimientoCaja::create([
-            'caja_id' => $caja->id,
-            'tipo' => 'ingreso',
-            'monto' => $factura->total,
-            'descripcion' => 'Factura emitida - Nº: ' . $factura->numero,
-            'fecha' => now(),
-                'referencia_id' => $factura->id,
-    'referencia_type' => \App\Models\Factura::class,
-    'user_id' => auth()->id(), // ← este campo es obligatorio
-        ]);
-    }
-   // $detalles = FacturaDetalle::where('factura_id', $factura->id)->get();
-   $detalles = FacturaDetalle::with('producto')
-    ->where('factura_id', $factura->id)
-    ->get()
-    ->map(function ($detalle) {
-        $total = $detalle->cantidad * $detalle->precio_unitario;
-        return (object)[
-            'cantidad' => $detalle->cantidad,
-            'descripcion' => $detalle->producto->nombre,
-            'precio_unitario' => $detalle->precio_unitario,
-            'preciouni' => $detalle->precio_unitario,
-            'total' => $total,
-            'id' => $detalle->id,
-            'coticode' => $detalle->factura_id,
-        ];
-    });
+    // --- Construcción de datos para la impresión ---
+    $detalles = FacturaDetalle::where('factura_id', $factura->id)
+        ->get()
+        ->map(function ($detalle) {
+            return (object)[
+                'cantidad' => $detalle->cantidad,
+                'descripcion' => $detalle->descripcion,
+                'precio_unitario' => $detalle->precio_unitario,
+                'preciouni' => $detalle->precio_unitario,
+                'total' => $detalle->subtotal,
+                'id' => $detalle->id,
+                'coticode' => $detalle->factura_id,
+            ];
+        });
+
     $cliente = Cliente::where('id', $factura->cliente_id)->get();
     $actual = $factura->created_at;
+
+
     if ($request->tipo == "consumidor") {
         return view('contingencia.generardteconsumidor', compact('actual', 'detalles', 'cliente'));
     }elseif ($request->tipo == "ccf") {

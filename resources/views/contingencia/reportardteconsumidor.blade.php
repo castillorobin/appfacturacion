@@ -93,16 +93,16 @@ function crearDTE($fecha_actual, $hora_actual, $original) {
     
     // Configurar emisor
     $dte->emisor = new Emisor();
-    $dte->emisor->nit = "008688551";
-    $dte->emisor->nombre = "VILMA JANNET GODOY MENDOZA";
-    $dte->emisor->nombreResponsable = "VILMA GODOY";
+    $dte->emisor->nit = "050080424";
+    $dte->emisor->nombre = "ERICK ROBERTO CLIMACO ARRIAGA";
+    $dte->emisor->nombreResponsable = "ERICK CLIMACO";
     $dte->emisor->tipoDocResponsable = "37";
     $dte->emisor->numeroDocResponsable = "0000001";
-    $dte->emisor->tipoEstablecimiento = "02";
+    $dte->emisor->tipoEstablecimiento = "02"; 
     $dte->emisor->codEstableMH = null;
     $dte->emisor->codPuntoVenta = null;
-    $dte->emisor->telefono = "2429-0920";
-    $dte->emisor->correo = "vilmademendoza71@gmail.com";
+    $dte->emisor->telefono = "7457-6280";
+    $dte->emisor->correo = "facturacionmeloexpress@gmail.com";
 
    // Configurar detalleDTE
 
@@ -136,19 +136,19 @@ function crearDTE($fecha_actual, $hora_actual, $original) {
 
 function enviarDTEAPI($dte) {
     $datos = [
-        'Usuario' => "02022504711049",
-        'Password' => "Camioneta2025.",
+        'Usuario' => "050080424",
+        'Password' => "Melo2025!",
         'Ambiente' => '00',
         'DteJson' => json_encode($dte),
-        'Nit' => "008688551",
-        'PasswordPrivado' => "Camioneta2025",
+        'Nit' => "06171401911015",
+        'PasswordPrivado' => "Meloexp1.",
         
         
     ];
 
    // echo "<pre>JSON enviado a la API:<br>" . json_encode($datos, JSON_PRETTY_PRINT) . "</pre>";
 
-    $ch = curl_init('http://98.89.90.33:7122/api/contingencia');
+    $ch = curl_init('http://54.152.201.240:7122/api/contingencia');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($datos));

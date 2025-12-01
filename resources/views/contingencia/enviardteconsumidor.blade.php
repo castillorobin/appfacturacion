@@ -103,23 +103,23 @@ function numeroALetras($numero) {
 
 function enviarDTEAPI($original) {
     $datos = [
-        'Usuario' => "02022504711049",
-        'Password' => "Camioneta2025.",
+        'Usuario' => "050080424",
+        'Password' => "Melo2025!",
         'Ambiente' => '00',
         'DteJson' => json_encode($original),
-        'Nit' => "008688551",
-        'PasswordPrivado' => "Camioneta2025",
+        'Nit' => "06171401911015",
+        'PasswordPrivado' => 'Meloexp1.',
         'TipoDte' => '01',
         'CodigoGeneracion' => $original['identificacion']['codigoGeneracion'],
         'NumControl' => $original['identificacion']['numeroControl'],
         'VersionDte' => 1,
-        'CorreoCliente' => "poncemarito2019@gmail.com"
-        //'CorreoCliente' => $cliente[0]->Correo
+        //'CorreoCliente' => "poncemarito2019@gmail.com"
+        //'CorreoCliente' => $cliente[0]->correo
     ];
 
    // echo "<pre>JSON enviado a la API:<br>" . json_encode($datos, JSON_PRETTY_PRINT) . "</pre>";
 
-    $ch = curl_init('http://98.89.90.33:7122/api/procesar-dte');
+    $ch = curl_init('http://54.152.201.240:7122/api/procesar-dte');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($datos));
