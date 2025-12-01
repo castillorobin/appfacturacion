@@ -153,14 +153,14 @@ public function store(Request $request)
     $actual = $factura->created_at;
 
     if ($request->tipo == "consumidor") {
-        $conteo = ConteoDTE::where('tipo', 'consumidor')->first();
+        $conteo = ConteoDTE::where('tipo', '01')->first();
         return view('facturas.generardteconsumidor', compact('actual', 'detalles', 'cliente', 'conteo'));
     } else if ($request->tipo == "ccf") {
 
         $codactividad = $cliente[0]->actividad_economica_id;
         $actividad = Actividad::where('codigo', $codactividad)->get();
         $actividad_descripcion = $actividad[0]->descripcion ?? 'No especificada';
-        $conteo = ConteoDTE::where('tipo', 'ccf')->first();
+        $conteo = ConteoDTE::where('tipo', '03')->first();
 
         return view('facturas.generardteccf', compact('actual', 'detalles', 'cliente', 'actividad_descripcion', 'conteo'));
     }
