@@ -251,7 +251,7 @@ $hora_actual = date("h:i:s");
  
 // Función para crear el DTE
 function crearDTE($fecha_actual, $hora_actual, $detalles, $cliente, $actividad_descripcion) {
-    $paradte = 90000000000 + $detalles[0]->id;
+    $paradte = 40000000000 + $detalles[0]->id;
     $dte = new DocumentoTributarioElectronico();
     
     // Configurar identificación
@@ -263,23 +263,23 @@ function crearDTE($fecha_actual, $hora_actual, $detalles, $cliente, $actividad_d
     
      // Configurar emisor
     $dte->emisor = new Emisor();
-    $dte->emisor->nit = "032267824";
-    $dte->emisor->nrc = "2193320";
-    $dte->emisor->nombre = "ROBIN ANTONIO CASTILLO SAAVEDRA";
-    $dte->emisor->codActividad = "96092";
-    $dte->emisor->descActividad = "Servicios n.c.p.";
-    $dte->emisor->nombreComercial = "ROBIN ANTONIO CASTILLO SAAVEDRA";
+    $dte->emisor->nit = "050080424";
+    $dte->emisor->nrc = "3100846";
+    $dte->emisor->nombre = "ERICK ROBERTO CLIMACO ARRIAGA";
+    $dte->emisor->codActividad = "53100";
+    $dte->emisor->descActividad = "Servicios de Correo Nacional";
+    $dte->emisor->nombreComercial = "ERICK CLIMACO";
     $dte->emisor->tipoEstablecimiento = "02";
     $dte->emisor->direccion = new Direccion();
-    $dte->emisor->direccion->departamento = "02";
-    $dte->emisor->direccion->municipio = "01";
-    $dte->emisor->direccion->complemento = "9 avenida Sur entre 1 y 3 calle";
-    $dte->emisor->telefono = "71902000";
+    $dte->emisor->direccion->departamento = "06";
+    $dte->emisor->direccion->municipio = "23";
+    $dte->emisor->direccion->complemento = "Calle Sisimiles, costado norte de Metrocentro, Local 3-1";
+    $dte->emisor->telefono = "7457-6280";
     $dte->emisor->codEstableMH = null;
     $dte->emisor->codEstable = null;
     $dte->emisor->codPuntoVentaMH = null;
     $dte->emisor->codPuntoVenta = null;
-    $dte->emisor->correo = "castillorobin11@gmail.com";
+    $dte->emisor->correo = "facturacionmeloexpress@gmail.com";
 
     // Configurar receptor
     $dte->receptor = new Receptor();
@@ -390,23 +390,24 @@ $dte->resumen->numPagoElectronico = null;
 // Función para enviar DTE a la API
 function enviarDTEAPI($dte, $factura) {
     $datos = [
-        'Usuario' => "032267824",
-        'Password' => "Alexan24.",
+        'Usuario' => "050080424",
+        'Password' => "Melo2025!",
         'Ambiente' => '00',
         'DteJson' => json_encode($dte),
-        'Nit' => "05152308851012",
-        'PasswordPrivado' => 'Pw6r$LbMw93',
+        'Nit' => "06171401911015",
+        'PasswordPrivado' => 'Meloexp1.',
         'TipoDte' => '03',
         'CodigoGeneracion' => $dte->identificacion->codigoGeneracion,
         'NumControl' => $dte->identificacion->numeroControl,
         'VersionDte' => 3,
-        'CorreoCliente' => "poncemarito2019@gmail.com"
+        //'CorreoCliente' => "poncemarito2019@gmail.com"
+        'CorreoCliente' => $cliente[0]->correo
         //'CorreoCliente' => $factura[0]->correo
     ];
 
    // echo "<pre>JSON enviado a la API:<br>" . json_encode($datos, JSON_PRETTY_PRINT) . "</pre>";
 
-    $ch = curl_init('http://98.89.90.33:7122/api/procesar-dte');
+    $ch = curl_init('http://54.152.201.240:7122/api/procesar-dte');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($datos));
