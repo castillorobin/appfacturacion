@@ -48,9 +48,9 @@
         <div class="mb-3">
             <label>Actividad Económica</label>
             <select name="actividad_economica_id" class="form-control select2 w-100">
-                <option value="">Seleccione</option>
+                <option value="{{ $cliente->actividad_economica_id }}">{{ $cliente->actividad_economica_id }}</option>
                 @foreach ($actividades as $actividad)
-                    <option value="{{ $actividad->codigo }}" {{ $cliente->actividad_economica_id == $actividad->codigo ? 'selected' : '' }}>
+                    <option value="{{ $actividad->codigo }}" >
                         {{ $actividad->descripcion }}
                     </option>
                 @endforeach
@@ -60,9 +60,9 @@
         <div class="mb-3">
             <label>Departamento</label>
             <select name="departamento_id" class="form-control select2 w-100">
-                <option value="">Seleccione</option>
+                <option value="{{ $cliente->departamento_id }}">{{ $cliente->departamento_id }}</option>
                 @foreach ($departamentos as $dpto)
-                    <option value="{{ $dpto->id }}" {{ $cliente->departamento_id == $dpto->id ? 'selected' : '' }}>
+                    <option value="{{ $dpto->codigo }}" >
                         {{ $dpto->valor }}
                     </option>
                 @endforeach
@@ -72,9 +72,9 @@
         <div class="mb-3">
             <label>Municipio</label>
             <select name="municipio_id" class="form-control select2 w-100">
-                <option value="">Seleccione</option>
+                <option value="{{ $cliente->municipio_id }}">{{ $cliente->municipio_id }}</option>
                 @foreach ($municipios as $mun)
-                    <option value="{{ $mun->id }}" {{ $cliente->municipio_id == $mun->id ? 'selected' : '' }}>
+                    <option value="{{ $mun->id }}" >
                         {{ $mun->valor }}
                     </option>
                 @endforeach

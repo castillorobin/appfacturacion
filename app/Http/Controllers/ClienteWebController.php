@@ -43,6 +43,7 @@ class ClienteWebController extends Controller
         'departamento_id' => 'nullable|string|max:255',
         'municipio_id' => 'nullable|string|max:255',
     ]);
+   // dd($request->all());
 
     
 
@@ -71,9 +72,9 @@ class ClienteWebController extends Controller
         'telefono' => 'nullable|string|max:20',
         'direccion' => 'nullable|string|max:255',
         'correo' => 'nullable|email|max:255',
-        'actividad_economica_id' => 'nullable|exists:actividades,id',
-        'departamento_id' => 'nullable|exists:departamentos,id',
-        'municipio_id' => 'nullable|exists:municipios,id',
+        'actividad_economica_id' => 'nullable|exists:actividades,codigo',
+        'departamento_id' => 'nullable|exists:departamentos,codigo',
+'municipio_id' => 'nullable|exists:municipios,codigo',
     ]);
 
     $cliente->update($request->all());

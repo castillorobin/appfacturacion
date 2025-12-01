@@ -17,9 +17,7 @@
             <p><strong>Teléfono:</strong> {{ $cliente->telefono ?? '-' }}</p>
             <p><strong>Correo:</strong> {{ $cliente->correo ?? '-' }}</p>
 
-            <p><strong>Actividad Económica:</strong> {{ $cliente->actividadEconomica->descripcion ?? '-' }}</p>
-            <p><strong>Departamento:</strong> {{ $cliente->departamento->valor ?? '-' }}</p>
-            <p><strong>Municipio:</strong> {{ $cliente->municipio->valor ?? '-' }}</p>
+           
 
         </div>
     </div>

@@ -63,6 +63,11 @@
         </div>
 
         <div class="form-group mb-3">
+            <label>Dirección</label>
+            <input type="text" name="direccion" class="form-control">
+        </div>
+
+        <div class="form-group mb-3">
     <label>Actividad Económica</label>
     <select name="actividad_economica_id" id="actividad_economica_id" class="form-control select2  w-100">
         <option value="">Seleccione</option>
