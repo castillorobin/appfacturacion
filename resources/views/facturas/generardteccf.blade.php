@@ -518,7 +518,7 @@ echo '
 <p></p>
 
 &nbsp; &nbsp; &nbsp;
-<a href="/facturas" class="btn btn-danger">Regresar </a>
+<a href="/dtes" class="btn btn-danger">Regresar </a>
 ';
 //Termina Almacenar datos del DTE
 
