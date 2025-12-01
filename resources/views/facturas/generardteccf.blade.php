@@ -440,7 +440,7 @@ try {
     $dte = crearDTE($fecha_actual, $hora_actual, $detalles, $cliente, $actividad_descripcion);
     echo "DTE generado correctamente.<br>";
     echo "Iniciando transferencia a la API...<br>";
-    $respuestaAPI = enviarDTEAPI($dte, $cliente);
+    $respuestaAPI = enviarDTEAPI($dte, $factura, $cliente);
     echo "Respuesta recibida de la API.<br>";
     // Imprimir sello de recepción antes de enviar el correo
    if (isset($respuestaAPI->selloRecibido)) {
