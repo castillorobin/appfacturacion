@@ -388,7 +388,7 @@ $dte->resumen->numPagoElectronico = null;
 }
 
 // Función para enviar DTE a la API
-function enviarDTEAPI($dte, $factura) {
+function enviarDTEAPI($dte, $factura, $cliente) {
     $datos = [
         'Usuario' => "050080424",
         'Password' => "Melo2025!",
