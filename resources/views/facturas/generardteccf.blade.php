@@ -388,7 +388,7 @@ $dte->resumen->numPagoElectronico = null;
 }
 
 // Función para enviar DTE a la API
-function enviarDTEAPI($dte, $factura, $cliente) {
+function enviarDTEAPI($dte, $cliente) {
     $datos = [
         'Usuario' => "050080424",
         'Password' => "Melo2025!",
@@ -440,7 +440,7 @@ try {
     $dte = crearDTE($fecha_actual, $hora_actual, $detalles, $cliente, $actividad_descripcion);
     echo "DTE generado correctamente.<br>";
     echo "Iniciando transferencia a la API...<br>";
-    $respuestaAPI = enviarDTEAPI($dte, $factura, $cliente);
+    $respuestaAPI = enviarDTEAPI($dte, $cliente);
     echo "Respuesta recibida de la API.<br>";
     // Imprimir sello de recepción antes de enviar el correo
    if (isset($respuestaAPI->selloRecibido)) {
