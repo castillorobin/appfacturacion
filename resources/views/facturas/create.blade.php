@@ -58,8 +58,9 @@
     <div class="col-md-3">
         <label for="tipo">Tipo</label>
         <select name="tipo" class="form-control" required>
-            <option value="consumidor">Consumidor Final</option>
             <option value="ccf">Crédito Fiscal</option>
+            <option value="consumidor">Consumidor Final</option>
+            
         </select>
     </div>
 </div>
