@@ -256,7 +256,7 @@ $hora_actual = date("h:i:s");
 
 // Función para crear el DTE
 function crearDTE($fecha_actual, $cliente, $hora_actual, $detalles, $conteo) {
-$paradte = 90000000000 + $detalles[0]->id;
+$paradte = 30000000000 + $detalles[0]->id;
  //$paradte = "00000000000" . ($conteo->conteo + 1);
 
     //dd($paradte);

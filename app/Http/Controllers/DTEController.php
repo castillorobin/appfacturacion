@@ -195,16 +195,16 @@ public function anular(Request $request, DocumentoDTE $dte)
             "horAnula" => now()->format('H:i:s'),
         ],
         "emisor" => [
-            "nit" => "032267824",
-            "nombre" => "ROBIN ANTONIO CASTILLO SAAVEDRA",
+            "nit" => "050080424",
+            "nombre" => "ERICK ROBERTO CLIMACO ARRIAGA",
             "tipoEstablecimiento" => "02",
-            "nomEstablecimiento" => "ROBIN ANTONIO CASTILLO SAAVEDRA",
+            "nomEstablecimiento" => "ERICK CLIMACO",
             "codEstableMH" => null,
             "codEstable" => "B001",
             "codPuntoVentaMH" => null,
             "codPuntoVenta" => "P001",
-            "telefono" => "71902000",
-            "correo" => "castillorobin11@gmail.com"
+            "telefono" => "7457-6280",
+            "correo" => "facturacionmeloexpress@gmail.com"
         ],
         "documento" => [
             "tipoDte" => $legible['identificacion']['tipoDte'],
@@ -233,12 +233,12 @@ public function anular(Request $request, DocumentoDTE $dte)
     ];
 
     $payload = [
-        "Usuario" => "0032267824",
-        "Password" => "Alexan24.",
+        "Usuario" => "050080424",
+        "Password" => "Melo2025!",
         "Ambiente" => "00",
         "DteJson" => json_encode($dteJson),
-        "Nit" => "05152308851012",
-        "PasswordPrivado" => 'Pw6r$LbMw93'
+        "Nit" => "06171401911015",
+        "PasswordPrivado" => 'Meloexp1.'
     ];
 
 
@@ -246,7 +246,7 @@ public function anular(Request $request, DocumentoDTE $dte)
     try {
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
-        ])->post('http://98.89.90.33:7122/api/anular-dte', $payload);
+        ])->post('http://54.152.201.240:7122/api/anular-dte', $payload);
 
         $result = $response->json();
 
