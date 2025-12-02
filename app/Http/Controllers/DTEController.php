@@ -189,7 +189,7 @@ public function anular(Request $request, DocumentoDTE $dte)
     $dteJson = [
         "identificacion" => [
             "version" => 2,
-            "ambiente" => "00",
+            "ambiente" => "01",
             "codigoGeneracion" => strtoupper(Str::uuid()->toString()),
             "fecAnula" => now()->format('Y-m-d'),
             "horAnula" => now()->format('H:i:s'),
@@ -235,7 +235,7 @@ public function anular(Request $request, DocumentoDTE $dte)
     $payload = [
         "Usuario" => "050080424",
         "Password" => "Melo2025!",
-        "Ambiente" => "00",
+        "Ambiente" => "01",
         "DteJson" => json_encode($dteJson),
         "Nit" => "06171401911015",
         "PasswordPrivado" => 'Meloexp1.'

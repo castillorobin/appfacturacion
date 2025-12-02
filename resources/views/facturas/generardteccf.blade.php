@@ -119,7 +119,7 @@ function sacartotal($detalles){
 // Clases para estructurar el DTE
 class Identificacion {
     public $version = 3;
-    public $ambiente = "00";
+    public $ambiente = "01";
     public $tipoDte = "03"; 
     public $numeroControl;
     public $codigoGeneracion;
@@ -292,8 +292,8 @@ $numeroControl = "DTE-03-M001P001-" . $correlativo;
     $dte->receptor->codActividad = $cliente[0]->actividad_economica_id;
     $dte->receptor->descActividad = $actividad_descripcion;
     $dte->receptor->direccion = new Direccion();
-    $dte->receptor->direccion->departamento = "03";//$cliente[0]->departamento;
-    $dte->receptor->direccion->municipio = "06";//$cliente[0]->municipio;
+    $dte->receptor->direccion->departamento = "06";//$cliente[0]->departamento;
+    $dte->receptor->direccion->municipio = "23";//$cliente[0]->municipio;
     $dte->receptor->direccion->complemento = "Avenida";//$cliente[0]->direccion;
     $dte->receptor->telefono = $cliente[0]->telefono;
     $dte->receptor->correo = $cliente[0]->correo;
@@ -394,7 +394,7 @@ function enviarDTEAPI($dte, $cliente) {
     $datos = [
         'Usuario' => "050080424",
         'Password' => "Melo2025!",
-        'Ambiente' => '00',
+        'Ambiente' => '01',
         'DteJson' => json_encode($dte),
         'Nit' => "06171401911015",
         'PasswordPrivado' => 'Meloexp1.',

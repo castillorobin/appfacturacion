@@ -88,9 +88,7 @@
     @endif
 
 
-@if($dte->tipo_dte === '03')
-    <a href="{{ route('notas-credito.formEmitir', $dte->id) }}" class="btn btn-sm btn-warning">Nota de Crédito</a>
-@endif
+
 </td>
 </tr>
 @endforeach
