@@ -187,7 +187,7 @@ public function anular(Request $request, DocumentoDTE $dte)
      // 1. Armar el JSON exacto como lo hiciste en Postman
      $legible = json_decode(Storage::get("dtes_json/legible_{$codigoGeneracion}.json"), true);
 //dd($legible['resumen']['totalPagar'] - $legible['resumen']['subTotal']);
-dd($legible);
+//dd($legible);
 
 if ($legible['tipoDte'] != '03') {
         $dteJson = [
