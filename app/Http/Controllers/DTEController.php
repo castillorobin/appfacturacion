@@ -183,10 +183,14 @@ public function anular(Request $request, DocumentoDTE $dte)
 {
     $motivo = $request->motivo ?? 'Anulación solicitada';
     $codigoGeneracion = $dte->codigo_generacion;
+    //dd($codigoGeneracion);
      // 1. Armar el JSON exacto como lo hiciste en Postman
      $legible = json_decode(Storage::get("dtes_json/legible_{$codigoGeneracion}.json"), true);
-//dd($legible);
-    $dteJson = [
+//dd($legible['resumen']['totalPagar'] - $legible['resumen']['subTotal']);
+dd($legible);
+
+if ($legible['tipoDte'] != '03') {
+        $dteJson = [
         "identificacion" => [
             "version" => 2,
             "ambiente" => "01",
@@ -264,6 +268,88 @@ public function anular(Request $request, DocumentoDTE $dte)
 
     } catch (\Exception $e) {
         return back()->with('error', 'Error al anular DTE: ' . $e->getMessage());
+    }
+    }else{
+
+    $dteJson = [
+        "identificacion" => [
+            "version" => 2,
+            "ambiente" => "01",
+            "codigoGeneracion" => strtoupper(Str::uuid()->toString()),
+            "fecAnula" => now()->format('Y-m-d'),
+            "horAnula" => now()->format('H:i:s'),
+        ],
+        "emisor" => [
+            "nit" => "050080424",
+            "nombre" => "ERICK ROBERTO CLIMACO ARRIAGA",
+            "tipoEstablecimiento" => "02",
+            "nomEstablecimiento" => "ERICK CLIMACO",
+            "codEstableMH" => null,
+            "codEstable" => "B001",
+            "codPuntoVentaMH" => null,
+            "codPuntoVenta" => "P001",
+            "telefono" => "7457-6280",
+            "correo" => "facturacionmeloexpress@gmail.com"
+        ],
+        "documento" => [
+            "tipoDte" => $legible['identificacion']['tipoDte'],
+            "codigoGeneracion" => $legible['identificacion']['codigoGeneracion'],
+            "selloRecibido" => $legible['selloRecibido'] ?? null,
+            "numeroControl" => $legible['identificacion']['numeroControl'],
+            "fecEmi" => $legible['identificacion']['fecEmi'],
+            "montoIva" => round($legible['resumen']['totalPagar'] - $legible['resumen']['subTotal'], 2),
+            "codigoGeneracionR" => null,
+            "tipoDocumento" => "37",
+            "numDocumento" => $legible['receptor']['nit'],
+            "nombre" => $legible['receptor']['nombre'],
+            "telefono" => $legible['receptor']['telefono'] ?? null,
+            "correo" => $legible['receptor']['correo'] ?? null,
+        ],
+        "motivo" => [
+            "tipoAnulacion" => 2,
+            "motivoAnulacion" => $motivo,
+            "nombreResponsable" => "ADMIN",
+            "tipDocResponsable" => "13",
+            "numDocResponsable" => "000000000",
+            "nombreSolicita" => "ADMIN",
+            "tipDocSolicita" => "13",
+            "numDocSolicita" => "000000000"
+        ]
+    ];
+
+    $payload = [
+        "Usuario" => "050080424",
+        "Password" => "Melo2025!",
+        "Ambiente" => "01",
+        "DteJson" => json_encode($dteJson),
+        "Nit" => "06171401911015",
+        "PasswordPrivado" => 'Meloexp1.'
+    ];
+
+
+
+    try {
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post('http://54.152.201.240:7122/api/anular-dte', $payload);
+
+        $result = $response->json();
+
+        if (!$response->successful()) {
+            return back()->with('error', 'Error en envío de DTE (anulación): ' . json_encode($result));
+        }
+
+        // Opcional: guardar confirmación de anulación
+        $dte->update([
+            'estado' => 'anulado',
+            'fecha_anulacion' => now(),
+        ]);
+
+        return back()->with('success', 'DTE anulado correctamente.');
+
+    } catch (\Exception $e) {
+        return back()->with('error', 'Error al anular DTE: ' . $e->getMessage());
+    }
     }
 }
 
