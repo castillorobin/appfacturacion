@@ -189,7 +189,8 @@ public function anular(Request $request, DocumentoDTE $dte)
 //dd($legible['resumen']['totalPagar'] - $legible['resumen']['subTotal']);
 //dd($legible);
 
-if ($legible['tipoDte'] != '03') {
+if ($legible['identificacion']['tipoDte'] != '03') {
+
         $dteJson = [
         "identificacion" => [
             "version" => 2,
@@ -235,7 +236,7 @@ if ($legible['tipoDte'] != '03') {
             "numDocSolicita" => "000000000"
         ]
     ];
-
+/*Produccion */
     $payload = [
         "Usuario" => "050080424",
         "Password" => "Melo2025!",
@@ -246,6 +247,17 @@ if ($legible['tipoDte'] != '03') {
     ];
 
 
+  /*  //Pruebas
+    $payload = [
+        "Usuario" => "050080424",
+        "Password" => "Melo2025.",
+        "Ambiente" => "00",
+        "DteJson" => json_encode($dteJson),
+        "Nit" => "06171401911015",
+        "PasswordPrivado" => 'Meloexp1.'
+    ];
+
+*/
 
     try {
         $response = Http::withHeaders([
@@ -317,6 +329,7 @@ if ($legible['tipoDte'] != '03') {
         ]
     ];
 
+    /*Produccion*/
     $payload = [
         "Usuario" => "050080424",
         "Password" => "Melo2025!",
@@ -326,6 +339,17 @@ if ($legible['tipoDte'] != '03') {
         "PasswordPrivado" => 'Meloexp1.'
     ];
 
+
+  /*  //Pruebas
+    $payload = [
+        "Usuario" => "050080424",
+        "Password" => "Melo2025.",
+        "Ambiente" => "00",
+        "DteJson" => json_encode($dteJson),
+        "Nit" => "06171401911015",
+        "PasswordPrivado" => 'Meloexp1.'
+    ];
+*/
 
 
     try {

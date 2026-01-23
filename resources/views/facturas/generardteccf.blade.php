@@ -119,7 +119,7 @@ function sacartotal($detalles){
 // Clases para estructurar el DTE
 class Identificacion {
     public $version = 3;
-    public $ambiente = "01";
+    public $ambiente = "00";
     public $tipoDte = "03"; 
     public $numeroControl;
     public $codigoGeneracion;
@@ -390,6 +390,8 @@ $dte->resumen->numPagoElectronico = null;
 }
 
 // Función para enviar DTE a la API
+
+//para pruebas en ambiente de produccion cambiar ambiente a 01
 function enviarDTEAPI($dte, $cliente) {
     $datos = [
         'Usuario' => "050080424",
@@ -406,6 +408,27 @@ function enviarDTEAPI($dte, $cliente) {
         'CorreoCliente' => $cliente[0]->correo
         //'CorreoCliente' => $factura[0]->correo
     ];
+   
+    /*
+//para pruebas en pruebas cambiar ambiente a 00
+    function enviarDTEAPI($dte, $cliente) {
+    $datos = [
+        'Usuario' => "050080424",
+        'Password' => "Melo2025.",
+        'Ambiente' => '00',
+        'DteJson' => json_encode($dte),
+        'Nit' => "06171401911015",
+        'PasswordPrivado' => 'Meloexp1.',
+        'TipoDte' => '03',
+        'CodigoGeneracion' => $dte->identificacion->codigoGeneracion,
+        'NumControl' => $dte->identificacion->numeroControl,
+        'VersionDte' => 3,
+        //'CorreoCliente' => "poncemarito2019@gmail.com"
+        'CorreoCliente' => $cliente[0]->correo
+        //'CorreoCliente' => $factura[0]->correo
+    ];
+
+    */
 
    // echo "<pre>JSON enviado a la API:<br>" . json_encode($datos, JSON_PRETTY_PRINT) . "</pre>";
 
