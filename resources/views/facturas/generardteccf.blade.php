@@ -119,7 +119,7 @@ function sacartotal($detalles){
 // Clases para estructurar el DTE
 class Identificacion {
     public $version = 3;
-    public $ambiente = "00";
+    public $ambiente = "01";
     public $tipoDte = "03"; 
     public $numeroControl;
     public $codigoGeneracion;
